@@ -3,43 +3,345 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Anime API</title>
+<title>AllenApi 👑 💻</title>
 <style>
-  :root { --bg: #09090b; --card: #141416; --accent: #ff77c8; --text: #f4f4f5; --muted: #71717a; }
-  body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
-  .doc { background: var(--card); padding: 30px; border-radius: 16px; width: 100%; max-width: 450px; border: 1px solid #27272a; text-align: center; }
-  h1 { color: var(--accent); margin: 0 0 8px 0; font-size: 24px; }
-  p { color: var(--muted); margin: 0 0 24px 0; font-size: 14px; }
-  .endpoint { display: flex; align-items: center; justify-content: space-between; background: #1f1f23; padding: 12px 16px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #3f3f46; }
-  .route { font-family: monospace; font-weight: bold; color: #7dffb3; }
-  .btn { background: var(--accent); color: #000; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; }
-  .btn:hover { opacity: 0.9; }
+  /* --- VARIABLES Y ESTILOS BASE --- */
+  :root {
+    --bg-dark: #0a0a0c;
+    --bg-card: #15151a;
+    --bg-nav: #0f0f13;
+    --accent: #ffb86c; /* Color corona/oro */
+    --accent-glow: rgba(255, 184, 108, 0.3);
+    --text-main: #f8f8f2;
+    --text-muted: #8b8b99;
+    --code-bg: #1e1e24;
+    --border: #2a2a35;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    overflow-x: hidden;
+  }
+
+  /* --- NAVBAR SUPERIOR --- */
+  .navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 60px;
+    background: var(--bg-nav);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .menu-btn {
+    background: none;
+    border: none;
+    color: var(--text-main);
+    font-size: 24px;
+    cursor: pointer;
+    margin-right: 15px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+  }
+
+  .logo-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent);
+    margin-right: 12px;
+    background: #222; /* Fondo por si no carga la imagen rápido */
+  }
+
+  .nav-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #ffb86c, #ff79c6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* --- SIDEBAR (MENÚ HAMBURGUESA) --- */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Oculto por defecto */
+    width: 280px;
+    height: 100vh;
+    background: var(--bg-nav);
+    border-right: 1px solid var(--border);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: 5px 0 20px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  .sidebar-links {
+    list-style: none;
+    padding: 20px 0;
+    margin: 0;
+  }
+
+  .sidebar-links li a {
+    display: block;
+    padding: 15px 25px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+
+  .sidebar-links li a:hover {
+    background: rgba(255, 184, 108, 0.1);
+    color: var(--accent);
+    border-left: 3px solid var(--accent);
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 999;
+  }
+
+  .overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* --- CONTENIDO PRINCIPAL --- */
+  .main-content {
+    margin-top: 80px;
+    padding: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+
+  h2 {
+    color: var(--text-main);
+    margin-top: 0;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 10px;
+    font-size: 1.5rem;
+  }
+
+  p {
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* --- CÓDIGO Y ENDPOINTS --- */
+  pre {
+    background: var(--code-bg);
+    padding: 15px;
+    border-radius: 10px;
+    overflow-x: auto;
+    border: 1px solid #333;
+    color: #50fa7b;
+    font-family: 'Fira Code', monospace;
+    font-size: 14px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .endpoint-card {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .endpoint-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    box-shadow: 0 5px 15px var(--accent-glow);
+  }
+
+  .endpoint-card h3 {
+    margin: 0 0 10px 0;
+    color: #bd93f9;
+    font-family: monospace;
+    font-size: 1.2rem;
+  }
+
+  .btn {
+    display: inline-block;
+    background: var(--text-main);
+    color: var(--bg-dark);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+  }
+
+  .btn:hover {
+    background: var(--accent);
+  }
 </style>
 </head>
 <body>
 
-<!-- Interfaz de documentación (Solo para humanos en la raíz) -->
-<div class="doc" id="docsView">
-  <h1>Anime Actions API</h1>
-  <p>Endpoints disponibles para bots y aplicaciones:</p>
-  
-  <div class="endpoint">
-    <span class="route">#kiss</span>
-    <a href="#kiss" class="btn">Probar</a>
-  </div>
-  
-  <div class="endpoint">
-    <span class="route">#hug</span>
-    <a href="#hug" class="btn">Probar</a>
-  </div>
-  
-  <div class="endpoint">
-    <span class="route">#kill</span>
-    <a href="#kill" class="btn">Probar</a>
-  </div>
+<!-- INTERFAZ VISUAL (Solo visible si no se consulta un endpoint) -->
+<div id="docs-ui">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <button class="menu-btn" id="openMenu">☰</button>
+    <!-- Aquí carga tu logo local -->
+    <img src="logo.jpg" alt="Logo AllenApi" class="logo-img" onerror="this.src='https://via.placeholder.com/36/222222/ffb86c?text=A'">
+    <h1 class="nav-title">AllenApi 👑 💻</h1>
+  </nav>
+
+  <!-- OVERLAY OSCURO -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- SIDEBAR / MENÚ HAMBURGUESA -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1 class="nav-title" style="font-size: 1.1rem;">Menú</h1>
+      <button class="close-btn" id="closeMenu">✕</button>
+    </div>
+    <ul class="sidebar-links">
+      <li><a href="#inicio" onclick="closeSidebar()">🏠 Inicio</a></li>
+      <li><a href="#como-usar" onclick="closeSidebar()">📖 Cómo Usar</a></li>
+      <li><a href="#endpoints" onclick="closeSidebar()">⚡ Endpoints</a></li>
+    </ul>
+  </aside>
+
+  <!-- CONTENIDO -->
+  <main class="main-content">
+    
+    <section id="inicio">
+      <h2>Bienvenido a AllenApi 👑</h2>
+      <p>La API definitiva para obtener reacciones de anime al instante. Diseñada con un motor de enrutamiento estático, responde en milisegundos entregando JSON puro para tus bots de Discord, Telegram o páginas web.</p>
+    </section>
+
+    <section id="como-usar">
+      <h2>📖 Cómo hacer peticiones (Fetch)</h2>
+      <p>Al ser una API basada en <b>Hash de URL</b>, para obtener los datos desde tu código solo debes agregar el nombre del endpoint con un <code>#</code> al final de la URL del archivo.</p>
+      <p><b>Ejemplo en JavaScript:</b></p>
+      <pre>
+// 1. Apunta a la URL de tu archivo y añade el endpoint (ej: #kiss)
+const apiUrl = "tu_pagina.html#kiss";
+
+// 2. Haz la petición fetch
+fetch(apiUrl)
+  .then(response => response.text()) // Leer como texto/html
+  .then(html => {
+    // 3. Extraer el JSON puro del body
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const jsonPuro = JSON.parse(doc.body.innerText);
+    
+    console.log(jsonPuro.gif); // Muestra el link del GIF!
+  });</pre>
+    </section>
+
+    <section id="endpoints">
+      <h2>⚡ Endpoints Disponibles</h2>
+      <p>Haz clic en "Probar" para simular lo que vería un bot. La interfaz desaparecerá y solo verás el JSON resultante.</p>
+      
+      <div class="grid">
+        <div class="endpoint-card">
+          <h3>#kiss</h3>
+          <p style="font-size: 0.85rem;">Acción: Beso</p>
+          <a href="#kiss" class="btn">Probar</a>
+        </div>
+        
+        <div class="endpoint-card">
+          <h3>#hug</h3>
+          <p style="font-size: 0.85rem;">Acción: Abrazo</p>
+          <a href="#hug" class="btn">Probar</a>
+        </div>
+        
+        <div class="endpoint-card">
+          <h3>#kill</h3>
+          <p style="font-size: 0.85rem;">Acción: Pelea / Matar</p>
+          <a href="#kill" class="btn">Probar</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
 </div>
 
+<!-- LÓGICA DE LA API Y UI -->
 <script>
+// --- 1. LÓGICA DEL MENÚ HAMBURGUESA ---
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+const openBtn = document.getElementById('openMenu');
+const closeBtn = document.getElementById('closeMenu');
+
+function openSidebar() {
+  sidebar.classList.add('active');
+  overlay.classList.add('active');
+}
+
+function closeSidebar() {
+  sidebar.classList.remove('active');
+  overlay.classList.remove('active');
+}
+
+openBtn.addEventListener('click', openSidebar);
+closeBtn.addEventListener('click', closeSidebar);
+overlay.addEventListener('click', closeSidebar);
+
+// --- 2. BASE DE DATOS DE LA API ---
 const endpoints = {
   "kiss": [
     { "action": "kiss", "gif": "https://media.tenor.com/217xK0yCGdMAAAAC/anime-kiss.gif" },
@@ -55,41 +357,49 @@ const endpoints = {
   ]
 };
 
-function procesarPeticion() {
+// --- 3. MOTOR DE LA API (DESTRUCCIÓN DE UI PARA BOTS) ---
+function procesarPeticionApi() {
   const hash = location.hash.replace("#", "");
 
-  // Si no hay hash, dejamos la interfaz estética de la documentación intacta
-  if (!hash) return;
+  // Hash de navegación interna (no destruir UI)
+  if (!hash || hash === "inicio" || hash === "como-usar" || hash === "endpoints") {
+    return; 
+  }
+
+  // DESTRUCCIÓN DE LA INTERFAZ PARA ENTREGAR JSON PURO AL BOT
+  document.documentElement.innerHTML = ""; // Borra absolutamente todo el HTML y CSS
+  const newBody = document.createElement("body");
+  newBody.style.margin = "0"; // 0 márgenes para limpieza total
+  document.documentElement.appendChild(newBody);
+
+  const pre = document.createElement("pre");
+  pre.style.wordWrap = "break-word";
+  pre.style.whiteSpace = "pre-wrap";
 
   if (endpoints[hash]) {
+    // Respuesta 200 OK - Selecciona un GIF aleatorio
     const lista = endpoints[hash];
     const itemAleatorio = lista[Math.floor(Math.random() * lista.length)];
-    
-    // DESTRUCCIÓN DE INTERFAZ: Devolvemos TEXTO PLANO puro para el bot
-    document.body.innerHTML = ""; 
-    document.body.removeAttribute("style");
-    
-    const pre = document.createElement("pre");
-    pre.style.margin = "0";
-    pre.style.fontFamily = "monospace";
     pre.textContent = JSON.stringify(itemAleatorio, null, 2);
-    
-    document.body.appendChild(pre);
   } else {
-    // Respuesta 404 en texto plano si meten un endpoint raro
-    document.body.innerHTML = "";
-    const pre = document.createElement("pre");
-    pre.style.margin = "0";
-    pre.style.color = "red";
-    pre.style.fontFamily = "monospace";
-    pre.textContent = JSON.stringify({ "error": "endpoint no encontrado" }, null, 2);
-    document.body.appendChild(pre);
+    // Respuesta 404 Error
+    pre.textContent = JSON.stringify({ "error": "Endpoint no encontrado en AllenApi" }, null, 2);
   }
+  
+  newBody.appendChild(pre);
 }
 
-// Escucha cambios de ruta y procesa al cargar la página
-window.addEventListener("hashchange", () => location.reload());
-procesarPeticion();
+// Escuchar cambios en el link
+window.addEventListener("hashchange", () => {
+  const hash = location.hash.replace("#", "");
+  // Solo recargamos si es una petición a un endpoint real para activar el modo texto
+  if (hash !== "inicio" && hash !== "como-usar" && hash !== "endpoints") {
+    location.reload(); 
+  }
+});
+
+// Ejecutar al cargar la página
+procesarPeticionApi();
 </script>
 
 </body>
