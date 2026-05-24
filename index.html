@@ -3,63 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>API de Acciones Anime</title>
+<title>Anime API</title>
 <style>
-  body { background: #0a0a0c; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-  .card { background: #1b1b1b; padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; border: 1px solid #333; }
-  pre { background: #000; padding: 15px; border-radius: 10px; color: #7dffb3; text-align: left; overflow-x: auto; font-size: 14px; }
-  img { width: 100%; border-radius: 10px; margin-top: 15px; }
-  h1 { color: #ff77c8; }
-  .hidden { display: none; }
-  .btn { display: block; background: #333; color: white; padding: 10px; margin: 5px 0; text-decoration: none; border-radius: 5px; }
+  :root { --bg: #09090b; --card: #141416; --accent: #ff77c8; --text: #f4f4f5; --muted: #71717a; }
+  body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
+  .doc { background: var(--card); padding: 30px; border-radius: 16px; width: 100%; max-width: 450px; border: 1px solid #27272a; text-align: center; }
+  h1 { color: var(--accent); margin: 0 0 8px 0; font-size: 24px; }
+  p { color: var(--muted); margin: 0 0 24px 0; font-size: 14px; }
+  .endpoint { display: flex; align-items: center; justify-content: space-between; background: #1f1f23; padding: 12px 16px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #3f3f46; }
+  .route { font-family: monospace; font-weight: bold; color: #7dffb3; }
+  .btn { background: var(--accent); color: #000; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+  .btn:hover { opacity: 0.9; }
 </style>
 </head>
 <body>
 
-<div class="card" id="app">
-  <div id="home">
-    <h1>Documentación API</h1>
-    <p>Usa estos enlaces para probar:</p>
-    <a href="#kiss" class="btn">GET /kiss</a>
-    <a href="#hug" class="btn">GET /hug</a>
-    <a href="#kill" class="btn">GET /kill</a>
+<!-- Interfaz de documentación (Solo para humanos en la raíz) -->
+<div class="doc" id="docsView">
+  <h1>Anime Actions API</h1>
+  <p>Endpoints disponibles para bots y aplicaciones:</p>
+  
+  <div class="endpoint">
+    <span class="route">#kiss</span>
+    <a href="#kiss" class="btn">Probar</a>
   </div>
-
-  <div id="response" class="hidden">
-    <h1 id="title"></h1>
-    <pre id="json"></pre>
-    <img id="gif">
-    <a href="#" class="btn">Volver</a>
+  
+  <div class="endpoint">
+    <span class="route">#hug</span>
+    <a href="#hug" class="btn">Probar</a>
+  </div>
+  
+  <div class="endpoint">
+    <span class="route">#kill</span>
+    <a href="#kill" class="btn">Probar</a>
   </div>
 </div>
 
 <script>
 const endpoints = {
-  "kiss": { gif: "https://media.tenor.com/217xK0yCGdMAAAAC/anime-kiss.gif" },
-  "hug": { gif: "https://media.tenor.com/FP6GehKjvXQAAAAC/anime-hug.gif" },
-  "kill": { gif: "https://media.tenor.com/I4mS6xAjQeIAAAAC/anime-fight.gif" }
+  "kiss": [
+    { "action": "kiss", "gif": "https://media.tenor.com/217xK0yCGdMAAAAC/anime-kiss.gif" },
+    { "action": "kiss", "gif": "https://media.tenor.com/b7dJHJi8z6AAAAAC/kiss-anime.gif" }
+  ],
+  "hug": [
+    { "action": "hug", "gif": "https://media.tenor.com/FP6GehKjvXQAAAAC/anime-hug.gif" },
+    { "action": "hug", "gif": "https://media.tenor.com/9e1aE_xB0C0AAAAC/hug-anime.gif" }
+  ],
+  "kill": [
+    { "action": "kill", "gif": "https://media.tenor.com/I4mS6xAjQeIAAAAC/anime-fight.gif" },
+    { "action": "kill", "gif": "https://media.tenor.com/XsL7D7vQxCIAAAAC/anime.gif" }
+  ]
 };
 
-function router() {
+function procesarPeticion() {
   const hash = location.hash.replace("#", "");
-  const home = document.getElementById("home");
-  const resp = document.getElementById("response");
+
+  // Si no hay hash, dejamos la interfaz estética de la documentación intacta
+  if (!hash) return;
 
   if (endpoints[hash]) {
-    home.classList.add("hidden");
-    resp.classList.remove("hidden");
-    document.getElementById("title").textContent = "/" + hash;
-    const data = { action: hash, gif: endpoints[hash].gif };
-    document.getElementById("json").textContent = JSON.stringify(data, null, 2);
-    document.getElementById("gif").src = data.gif;
+    const lista = endpoints[hash];
+    const itemAleatorio = lista[Math.floor(Math.random() * lista.length)];
+    
+    // DESTRUCCIÓN DE INTERFAZ: Devolvemos TEXTO PLANO puro para el bot
+    document.body.innerHTML = ""; 
+    document.body.removeAttribute("style");
+    
+    const pre = document.createElement("pre");
+    pre.style.margin = "0";
+    pre.style.fontFamily = "monospace";
+    pre.textContent = JSON.stringify(itemAleatorio, null, 2);
+    
+    document.body.appendChild(pre);
   } else {
-    home.classList.remove("hidden");
-    resp.classList.add("hidden");
+    // Respuesta 404 en texto plano si meten un endpoint raro
+    document.body.innerHTML = "";
+    const pre = document.createElement("pre");
+    pre.style.margin = "0";
+    pre.style.color = "red";
+    pre.style.fontFamily = "monospace";
+    pre.textContent = JSON.stringify({ "error": "endpoint no encontrado" }, null, 2);
+    document.body.appendChild(pre);
   }
 }
 
-window.addEventListener("hashchange", router);
-router();
+// Escucha cambios de ruta y procesa al cargar la página
+window.addEventListener("hashchange", () => location.reload());
+procesarPeticion();
 </script>
+
 </body>
 </html>
