@@ -10,21 +10,16 @@
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap');
         body { background: #020408; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; }
         
-        /* Sistema de Pestañas (Tabs) */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        
         .glass-card { background: rgba(10, 15, 25, 0.8); border: 1px solid #1e293b; backdrop-filter: blur(12px); }
         .code-screen { background: #000; color: #50fa7b; font-size: 12px; border: 1px solid #1e293b; border-radius: 1rem; }
-        
-        /* Menú Hamburguesa Lateral Deslizable */
         .sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .sidebar.closed { transform: translateX(-100%); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- INTERFAZ VISUAL DEL DASHBOARD -->
     <div id="api-dashboard">
         <!-- NAVBAR -->
         <nav class="p-4 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md flex justify-between items-center sticky top-0 z-50">
@@ -41,25 +36,23 @@
                 <div class="text-right hidden sm:block">
                     <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">ESTADO API</p>
                     <p class="text-[10px] text-emerald-400 font-bold flex items-center gap-1 justify-end">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> CORE_ONLINE
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ONLINE
                     </p>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-[10px] font-bold text-amber-500">v2.5</div>
+                <div class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-[10px] font-bold text-amber-500">v3.0</div>
             </div>
         </nav>
 
-        <!-- OVERLAY PARA CERRAR EL MENÚ -->
         <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden opacity-0 transition-opacity duration-300"></div>
         
-        <!-- SIDEBAR (MENÚ HAMBURGUESA) -->
+        <!-- SIDEBAR -->
         <aside id="sidebar" class="sidebar closed fixed top-0 left-0 w-64 h-full bg-slate-950 border-r border-slate-900 z-50 p-5 flex flex-col justify-between">
             <div class="space-y-6">
                 <div class="flex justify-between items-center pb-4 border-b border-slate-900">
-                    <span class="text-xs font-black tracking-widest text-slate-500 uppercase">Secciones</span>
+                    <span class="text-xs font-black tracking-widest text-slate-500 uppercase">Navegación</span>
                     <button onclick="toggleSidebar()" class="text-slate-500 hover:text-white text-sm">✕</button>
                 </div>
                 
-                <!-- Links de las Pestañas -->
                 <nav id="sidebar-menu" class="space-y-2">
                     <button onclick="setTab('inicio')" id="btn-inicio" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider text-amber-500 bg-amber-500/10 border border-amber-500/20 text-left">
                         <i class="fas fa-home w-4"></i> Inicio
@@ -72,15 +65,12 @@
                     </button>
                 </nav>
             </div>
-            <div class="p-3 bg-slate-900/50 border border-slate-900 rounded-xl text-center">
-                <p class="text-[9px] text-slate-500 font-bold">ALLEN API PRO</p>
-            </div>
         </aside>
 
-        <!-- CONTENEDOR PRINCIPAL DE PESTAÑAS -->
+        <!-- PESTAÑAS -->
         <main class="p-4 sm:p-6 max-w-3xl w-full mx-auto my-4 flex-1">
 
-            <!-- PESTAÑA: INICIO -->
+            <!-- INICIO -->
             <section id="tab-inicio" class="tab-content active">
                 <div class="glass-card p-6 sm:p-8 rounded-[2rem] space-y-4">
                     <div class="w-12 h-12 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center text-amber-500 text-xl">
@@ -88,91 +78,92 @@
                     </div>
                     <h2 class="font-black italic text-xl tracking-wide uppercase">AllenApi_System</h2>
                     <p class="text-xs text-slate-400 leading-relaxed">
-                        Bienvenido al panel central de control. Esta API simula respuestas automáticas con estructuras JSON validadas para el desarrollo y testeo de integraciones externas en tiempo récord.
+                        API optimizada para funcionar 100% en entornos estáticos como GitHub Pages sin errores 404.
                     </p>
                 </div>
             </section>
 
-            <!-- PESTAÑA: GUÍA DE USO -->
+            <!-- DOCUMENTACIÓN -->
             <section id="tab-docs" class="tab-content">
                 <div class="glass-card p-6 rounded-2xl space-y-4">
-                    <h3 class="font-black italic text-sm tracking-widest text-blue-400 uppercase">MÉTODO_DE_PETICIÓN</h3>
-                    <p class="text-xs text-slate-400">Puedes realizar llamadas directamente usando el endpoint en la URL. Los bots obtendrán un objeto JSON limpio y parseable.</p>
+                    <h3 class="font-black italic text-sm tracking-widest text-blue-400 uppercase">PETICIÓN_HTTP (Bots)</h3>
+                    <p class="text-xs text-slate-400">En GitHub Pages debes pasar la variable <code>?api=</code> al final de tu enlace para no generar un 404.</p>
                     <pre class="code-screen p-4 overflow-x-auto text-xs leading-5">
-fetch("https://tu-dominio.com/kiss")
+// Ejemplo para tu bot:
+fetch("https://tu-usuario.github.io/tu-repo/?api=kiss")
   .then(res => res.json())
   .then(data => {
     console.log(data.action); // "kiss"
-    console.log(data.gif);    // URL del archivo gif
+    console.log(data.gif);    
   });</pre>
                 </div>
             </section>
 
-            <!-- PESTAÑA: ENDPOINTS -->
+            <!-- ENDPOINTS -->
             <section id="tab-endpoints" class="tab-content">
                 <div class="space-y-3">
                     <h3 class="font-black italic text-xs tracking-widest text-slate-500 uppercase px-1">RUTAS_DISPONIBLES</h3>
                     
+                    <!-- KISS -->
                     <div class="glass-card p-4 rounded-2xl flex justify-between items-center border-l-4 border-l-purple-500">
                         <div class="flex items-center gap-4">
                             <span class="text-xs font-bold text-purple-400 bg-purple-500/10 px-2 py-1 rounded-md">GET</span>
                             <div>
-                                <p class="font-black text-xs uppercase">/kiss</p>
-                                <p class="text-[9px] text-slate-500">Retorna respuesta JSON aleatoria de besos</p>
+                                <p class="font-black text-xs uppercase">?api=kiss</p>
                             </div>
                         </div>
-                        <a href="/kiss" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">Visitar</a>
+                        <a href="?api=kiss" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">Visitar</a>
                     </div>
 
+                    <!-- HUG -->
                     <div class="glass-card p-4 rounded-2xl flex justify-between items-center border-l-4 border-l-blue-500">
                         <div class="flex items-center gap-4">
                             <span class="text-xs font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded-md">GET</span>
                             <div>
-                                <p class="font-black text-xs uppercase">/hug</p>
-                                <p class="text-[9px] text-slate-500">Retorna respuesta JSON aleatoria de abrazos</p>
+                                <p class="font-black text-xs uppercase">?api=hug</p>
                             </div>
                         </div>
-                        <a href="/hug" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">Visitar</a>
+                        <a href="?api=hug" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">Visitar</a>
                     </div>
 
+                    <!-- KILL -->
                     <div class="glass-card p-4 rounded-2xl flex justify-between items-center border-l-4 border-l-red-500">
                         <div class="flex items-center gap-4">
                             <span class="text-xs font-bold text-red-400 bg-red-500/10 px-2 py-1 rounded-md">GET</span>
                             <div>
-                                <p class="font-black text-xs uppercase">/kill</p>
-                                <p class="text-[9px] text-slate-500">Retorna respuesta JSON aleatoria de peleas</p>
+                                <p class="font-black text-xs uppercase">?api=kill</p>
                             </div>
                         </div>
-                        <a href="/kill" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">Visitar</a>
+                        <a href="?api=kill" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">Visitar</a>
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- SCRIPT DE CONTROL - TU LÓGICA ORIGINAL RESTAURADA -->
+    <!-- SCRIPT DE CONTROL PARA GITHUB PAGES -->
     <script>
-        const ruta = location.pathname;
+        // Leemos el parámetro de la URL (Ej: ?api=kiss)
+        const params = new URLSearchParams(window.location.search);
+        const endpointSolicitado = params.get('api');
 
-        const endpoints = {
-            "/kiss": [
+        const baseDatos = {
+            "kiss": [
                 { action: "kiss", gif: "https://media.tenor.com/217xK0yCGdMAAAAC/anime-kiss.gif" },
                 { action: "kiss", gif: "https://media.tenor.com/b7dJHJi8z6AAAAAC/kiss-anime.gif" }
             ],
-            "/hug": [
+            "hug": [
                 { action: "hug", gif: "https://media.tenor.com/FP6GehKjvXQAAAAC/anime-hug.gif" },
                 { action: "hug", gif: "https://media.tenor.com/9e1aE_xB0C0AAAAC/hug-anime.gif" }
             ],
-            "/kill": [
+            "kill": [
                 { action: "kill", gif: "https://media.tenor.com/I4mS6xAjQeIAAAAC/anime-fight.gif" },
                 { action: "kill", gif: "https://media.tenor.com/XsL7D7vQxCIAAAAC/anime.gif" }
             ]
         };
 
-        // --- MANEJO DEL ENRUTADOR (BOTS VS DASHBOARD) ---
-        // Si la ruta no coincide con ningún comando de la API, asumimos que está en la raíz "/" mostrando el menú
-        if (endpoints[ruta]) {
-            // Un bot o usuario solicitó un endpoint real -> DESTRUIMOS TODO EL HTML
+        // Si existe el parámetro y coincide con nuestra base de datos, destruimos el HTML y damos el JSON
+        if (endpointSolicitado && baseDatos[endpointSolicitado]) {
             document.documentElement.innerHTML = "";
             
             const bodyPlano = document.createElement("body");
@@ -186,38 +177,30 @@ fetch("https://tu-dominio.com/kiss")
             pre.style.fontFamily = "monospace";
             pre.style.whiteSpace = "pre-wrap";
 
-            const listaGifs = endpoints[ruta];
+            const listaGifs = baseDatos[endpointSolicitado];
             const respuestaAleatoria = listaGifs[Math.floor(Math.random() * listaGifs.length)];
 
-            // Imprimimos el JSON puro para los bots
             pre.textContent = JSON.stringify(respuestaAleatoria, null, 2);
             bodyPlano.appendChild(pre);
         }
 
-        // --- SISTEMA DE TABS DEL MENÚ HAMBURGUESA ---
+        // --- SISTEMA DEL MENÚ (Solo se ejecuta si NO hay parámetro de API) ---
         function setTab(tabId) {
-            // Desactivar todos los contenidos de pestañas
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            // Activar el seleccionado
             document.getElementById('tab-' + tabId).classList.add('active');
 
-            // Resetear estilos de botones del menú lateral
             const botones = document.querySelectorAll('#sidebar-menu button');
             botones.forEach(btn => {
                 btn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-400 hover:bg-slate-900 hover:text-white text-left transition-all";
             });
 
-            // Marcar botón activo
             const btnActivo = document.getElementById('btn-' + tabId);
             if(btnActivo) {
                 btnActivo.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider text-amber-500 bg-amber-500/10 border border-amber-500/20 text-left";
             }
-
-            // Cerrar menú
             closeSidebar();
         }
 
-        // --- FUNCIONES DEL SIDEBAR ---
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
