@@ -1,406 +1,242 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AllenApi 👑 💻</title>
-<style>
-  /* --- VARIABLES Y ESTILOS BASE --- */
-  :root {
-    --bg-dark: #0a0a0c;
-    --bg-card: #15151a;
-    --bg-nav: #0f0f13;
-    --accent: #ffb86c; /* Color corona/oro */
-    --accent-glow: rgba(255, 184, 108, 0.3);
-    --text-main: #f8f8f2;
-    --text-muted: #8b8b99;
-    --code-bg: #1e1e24;
-    --border: #2a2a35;
-  }
-
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    overflow-x: hidden;
-  }
-
-  /* --- NAVBAR SUPERIOR --- */
-  .navbar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 60px;
-    background: var(--bg-nav);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    padding: 0 20px;
-    z-index: 100;
-    backdrop-filter: blur(10px);
-  }
-
-  .menu-btn {
-    background: none;
-    border: none;
-    color: var(--text-main);
-    font-size: 24px;
-    cursor: pointer;
-    margin-right: 15px;
-    padding: 5px;
-    display: flex;
-    align-items: center;
-  }
-
-  .logo-img {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--accent);
-    margin-right: 12px;
-    background: #222; /* Fondo por si no carga la imagen rápido */
-  }
-
-  .nav-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin: 0;
-    letter-spacing: 1px;
-    background: linear-gradient(90deg, #ffb86c, #ff79c6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  /* --- SIDEBAR (MENÚ HAMBURGUESA) --- */
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: -280px; /* Oculto por defecto */
-    width: 280px;
-    height: 100vh;
-    background: var(--bg-nav);
-    border-right: 1px solid var(--border);
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1000;
-    box-shadow: 5px 0 20px rgba(0,0,0,0.5);
-    display: flex;
-    flex-direction: column;
-  }
-
-  .sidebar.active {
-    left: 0;
-  }
-
-  .sidebar-header {
-    padding: 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .close-btn {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 24px;
-    cursor: pointer;
-  }
-
-  .sidebar-links {
-    list-style: none;
-    padding: 20px 0;
-    margin: 0;
-  }
-
-  .sidebar-links li a {
-    display: block;
-    padding: 15px 25px;
-    color: var(--text-main);
-    text-decoration: none;
-    font-weight: 500;
-    transition: background 0.2s;
-  }
-
-  .sidebar-links li a:hover {
-    background: rgba(255, 184, 108, 0.1);
-    color: var(--accent);
-    border-left: 3px solid var(--accent);
-  }
-
-  .overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.6);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-    z-index: 999;
-  }
-
-  .overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* --- CONTENIDO PRINCIPAL --- */
-  .main-content {
-    margin-top: 80px;
-    padding: 20px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  section {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 30px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  }
-
-  h2 {
-    color: var(--text-main);
-    margin-top: 0;
-    border-bottom: 2px solid var(--border);
-    padding-bottom: 10px;
-    font-size: 1.5rem;
-  }
-
-  p {
-    color: var(--text-muted);
-    line-height: 1.6;
-  }
-
-  /* --- CÓDIGO Y ENDPOINTS --- */
-  pre {
-    background: var(--code-bg);
-    padding: 15px;
-    border-radius: 10px;
-    overflow-x: auto;
-    border: 1px solid #333;
-    color: #50fa7b;
-    font-family: 'Fira Code', monospace;
-    font-size: 14px;
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-  }
-
-  .endpoint-card {
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 15px;
-    text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  .endpoint-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--accent);
-    box-shadow: 0 5px 15px var(--accent-glow);
-  }
-
-  .endpoint-card h3 {
-    margin: 0 0 10px 0;
-    color: #bd93f9;
-    font-family: monospace;
-    font-size: 1.2rem;
-  }
-
-  .btn {
-    display: inline-block;
-    background: var(--text-main);
-    color: var(--bg-dark);
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 0.9rem;
-    transition: background 0.2s;
-  }
-
-  .btn:hover {
-    background: var(--accent);
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AllenApi 👑 💻</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap');
+        body { background: #020408; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; }
+        
+        /* Sistema de Pestañas (Tabs) */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .glass-card { background: rgba(10, 15, 25, 0.8); border: 1px solid #1e293b; backdrop-filter: blur(12px); }
+        .code-screen { background: #000; color: #50fa7b; font-size: 12px; border: 1px solid #1e293b; border-radius: 1rem; }
+        
+        /* Menú Hamburguesa Lateral Deslizable */
+        .sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar.closed { transform: translateX(-100%); }
+    </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 
-<!-- INTERFAZ VISUAL (Solo visible si no se consulta un endpoint) -->
-<div id="docs-ui">
+    <!-- INTERFAZ VISUAL DEL DASHBOARD -->
+    <div id="api-dashboard">
+        <!-- NAVBAR -->
+        <nav class="p-4 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md flex justify-between items-center sticky top-0 z-50">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white text-xl p-1">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div onclick="setTab('inicio')" class="cursor-pointer flex items-center gap-2">
+                    <img src="logo.jpg" alt="👑" class="w-8 h-8 rounded-full border border-amber-500 object-cover" onerror="this.src='https://via.placeholder.com/32/0a0f19/ffb86c?text=A'">
+                    <span class="font-black text-sm tracking-wider uppercase">Allen<span class="text-amber-500">Api</span> 👑</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">ESTADO API</p>
+                    <p class="text-[10px] text-emerald-400 font-bold flex items-center gap-1 justify-end">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> CORE_ONLINE
+                    </p>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-[10px] font-bold text-amber-500">v2.5</div>
+            </div>
+        </nav>
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <button class="menu-btn" id="openMenu">☰</button>
-    <!-- Aquí carga tu logo local -->
-    <img src="logo.jpg" alt="Logo AllenApi" class="logo-img" onerror="this.src='https://via.placeholder.com/36/222222/ffb86c?text=A'">
-    <h1 class="nav-title">AllenApi 👑 💻</h1>
-  </nav>
+        <!-- OVERLAY PARA CERRAR EL MENÚ -->
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden opacity-0 transition-opacity duration-300"></div>
+        
+        <!-- SIDEBAR (MENÚ HAMBURGUESA) -->
+        <aside id="sidebar" class="sidebar closed fixed top-0 left-0 w-64 h-full bg-slate-950 border-r border-slate-900 z-50 p-5 flex flex-col justify-between">
+            <div class="space-y-6">
+                <div class="flex justify-between items-center pb-4 border-b border-slate-900">
+                    <span class="text-xs font-black tracking-widest text-slate-500 uppercase">Secciones</span>
+                    <button onclick="toggleSidebar()" class="text-slate-500 hover:text-white text-sm">✕</button>
+                </div>
+                
+                <!-- Links de las Pestañas -->
+                <nav id="sidebar-menu" class="space-y-2">
+                    <button onclick="setTab('inicio')" id="btn-inicio" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider text-amber-500 bg-amber-500/10 border border-amber-500/20 text-left">
+                        <i class="fas fa-home w-4"></i> Inicio
+                    </button>
+                    <button onclick="setTab('docs')" id="btn-docs" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-400 hover:bg-slate-900 hover:text-white text-left transition-all">
+                        <i class="fas fa-book w-4"></i> Guía de Uso
+                    </button>
+                    <button onclick="setTab('endpoints')" id="btn-endpoints" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-400 hover:bg-slate-900 hover:text-white text-left transition-all">
+                        <i class="fas fa-code-branch w-4"></i> Endpoints
+                    </button>
+                </nav>
+            </div>
+            <div class="p-3 bg-slate-900/50 border border-slate-900 rounded-xl text-center">
+                <p class="text-[9px] text-slate-500 font-bold">ALLEN API PRO</p>
+            </div>
+        </aside>
 
-  <!-- OVERLAY OSCURO -->
-  <div class="overlay" id="overlay"></div>
+        <!-- CONTENEDOR PRINCIPAL DE PESTAÑAS -->
+        <main class="p-4 sm:p-6 max-w-3xl w-full mx-auto my-4 flex-1">
 
-  <!-- SIDEBAR / MENÚ HAMBURGUESA -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <h1 class="nav-title" style="font-size: 1.1rem;">Menú</h1>
-      <button class="close-btn" id="closeMenu">✕</button>
-    </div>
-    <ul class="sidebar-links">
-      <li><a href="#inicio" onclick="closeSidebar()">🏠 Inicio</a></li>
-      <li><a href="#como-usar" onclick="closeSidebar()">📖 Cómo Usar</a></li>
-      <li><a href="#endpoints" onclick="closeSidebar()">⚡ Endpoints</a></li>
-    </ul>
-  </aside>
+            <!-- PESTAÑA: INICIO -->
+            <section id="tab-inicio" class="tab-content active">
+                <div class="glass-card p-6 sm:p-8 rounded-[2rem] space-y-4">
+                    <div class="w-12 h-12 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center text-amber-500 text-xl">
+                        <i class="fas fa-terminal"></i>
+                    </div>
+                    <h2 class="font-black italic text-xl tracking-wide uppercase">AllenApi_System</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Bienvenido al panel central de control. Esta API simula respuestas automáticas con estructuras JSON validadas para el desarrollo y testeo de integraciones externas en tiempo récord.
+                    </p>
+                </div>
+            </section>
 
-  <!-- CONTENIDO -->
-  <main class="main-content">
-    
-    <section id="inicio">
-      <h2>Bienvenido a AllenApi 👑</h2>
-      <p>La API definitiva para obtener reacciones de anime al instante. Diseñada con un motor de enrutamiento estático, responde en milisegundos entregando JSON puro para tus bots de Discord, Telegram o páginas web.</p>
-    </section>
-
-    <section id="como-usar">
-      <h2>📖 Cómo hacer peticiones (Fetch)</h2>
-      <p>Al ser una API basada en <b>Hash de URL</b>, para obtener los datos desde tu código solo debes agregar el nombre del endpoint con un <code>#</code> al final de la URL del archivo.</p>
-      <p><b>Ejemplo en JavaScript:</b></p>
-      <pre>
-// 1. Apunta a la URL de tu archivo y añade el endpoint (ej: #kiss)
-const apiUrl = "tu_pagina.html#kiss";
-
-// 2. Haz la petición fetch
-fetch(apiUrl)
-  .then(response => response.text()) // Leer como texto/html
-  .then(html => {
-    // 3. Extraer el JSON puro del body
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    const jsonPuro = JSON.parse(doc.body.innerText);
-    
-    console.log(jsonPuro.gif); // Muestra el link del GIF!
+            <!-- PESTAÑA: GUÍA DE USO -->
+            <section id="tab-docs" class="tab-content">
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <h3 class="font-black italic text-sm tracking-widest text-blue-400 uppercase">MÉTODO_DE_PETICIÓN</h3>
+                    <p class="text-xs text-slate-400">Puedes realizar llamadas directamente usando el endpoint en la URL. Los bots obtendrán un objeto JSON limpio y parseable.</p>
+                    <pre class="code-screen p-4 overflow-x-auto text-xs leading-5">
+fetch("https://tu-dominio.com/kiss")
+  .then(res => res.json())
+  .then(data => {
+    console.log(data.action); // "kiss"
+    console.log(data.gif);    // URL del archivo gif
   });</pre>
-    </section>
+                </div>
+            </section>
 
-    <section id="endpoints">
-      <h2>⚡ Endpoints Disponibles</h2>
-      <p>Haz clic en "Probar" para simular lo que vería un bot. La interfaz desaparecerá y solo verás el JSON resultante.</p>
-      
-      <div class="grid">
-        <div class="endpoint-card">
-          <h3>#kiss</h3>
-          <p style="font-size: 0.85rem;">Acción: Beso</p>
-          <a href="#kiss" class="btn">Probar</a>
-        </div>
-        
-        <div class="endpoint-card">
-          <h3>#hug</h3>
-          <p style="font-size: 0.85rem;">Acción: Abrazo</p>
-          <a href="#hug" class="btn">Probar</a>
-        </div>
-        
-        <div class="endpoint-card">
-          <h3>#kill</h3>
-          <p style="font-size: 0.85rem;">Acción: Pelea / Matar</p>
-          <a href="#kill" class="btn">Probar</a>
-        </div>
-      </div>
-    </section>
+            <!-- PESTAÑA: ENDPOINTS -->
+            <section id="tab-endpoints" class="tab-content">
+                <div class="space-y-3">
+                    <h3 class="font-black italic text-xs tracking-widest text-slate-500 uppercase px-1">RUTAS_DISPONIBLES</h3>
+                    
+                    <div class="glass-card p-4 rounded-2xl flex justify-between items-center border-l-4 border-l-purple-500">
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs font-bold text-purple-400 bg-purple-500/10 px-2 py-1 rounded-md">GET</span>
+                            <div>
+                                <p class="font-black text-xs uppercase">/kiss</p>
+                                <p class="text-[9px] text-slate-500">Retorna respuesta JSON aleatoria de besos</p>
+                            </div>
+                        </div>
+                        <a href="/kiss" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">Visitar</a>
+                    </div>
 
-  </main>
-</div>
+                    <div class="glass-card p-4 rounded-2xl flex justify-between items-center border-l-4 border-l-blue-500">
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded-md">GET</span>
+                            <div>
+                                <p class="font-black text-xs uppercase">/hug</p>
+                                <p class="text-[9px] text-slate-500">Retorna respuesta JSON aleatoria de abrazos</p>
+                            </div>
+                        </div>
+                        <a href="/hug" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">Visitar</a>
+                    </div>
 
-<!-- LÓGICA DE LA API Y UI -->
-<script>
-// --- 1. LÓGICA DEL MENÚ HAMBURGUESA ---
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('overlay');
-const openBtn = document.getElementById('openMenu');
-const closeBtn = document.getElementById('closeMenu');
+                    <div class="glass-card p-4 rounded-2xl flex justify-between items-center border-l-4 border-l-red-500">
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs font-bold text-red-400 bg-red-500/10 px-2 py-1 rounded-md">GET</span>
+                            <div>
+                                <p class="font-black text-xs uppercase">/kill</p>
+                                <p class="text-[9px] text-slate-500">Retorna respuesta JSON aleatoria de peleas</p>
+                            </div>
+                        </div>
+                        <a href="/kill" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">Visitar</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
 
-function openSidebar() {
-  sidebar.classList.add('active');
-  overlay.classList.add('active');
-}
+    <!-- SCRIPT DE CONTROL - TU LÓGICA ORIGINAL RESTAURADA -->
+    <script>
+        const ruta = location.pathname;
 
-function closeSidebar() {
-  sidebar.classList.remove('active');
-  overlay.classList.remove('active');
-}
+        const endpoints = {
+            "/kiss": [
+                { action: "kiss", gif: "https://media.tenor.com/217xK0yCGdMAAAAC/anime-kiss.gif" },
+                { action: "kiss", gif: "https://media.tenor.com/b7dJHJi8z6AAAAAC/kiss-anime.gif" }
+            ],
+            "/hug": [
+                { action: "hug", gif: "https://media.tenor.com/FP6GehKjvXQAAAAC/anime-hug.gif" },
+                { action: "hug", gif: "https://media.tenor.com/9e1aE_xB0C0AAAAC/hug-anime.gif" }
+            ],
+            "/kill": [
+                { action: "kill", gif: "https://media.tenor.com/I4mS6xAjQeIAAAAC/anime-fight.gif" },
+                { action: "kill", gif: "https://media.tenor.com/XsL7D7vQxCIAAAAC/anime.gif" }
+            ]
+        };
 
-openBtn.addEventListener('click', openSidebar);
-closeBtn.addEventListener('click', closeSidebar);
-overlay.addEventListener('click', closeSidebar);
+        // --- MANEJO DEL ENRUTADOR (BOTS VS DASHBOARD) ---
+        // Si la ruta no coincide con ningún comando de la API, asumimos que está en la raíz "/" mostrando el menú
+        if (endpoints[ruta]) {
+            // Un bot o usuario solicitó un endpoint real -> DESTRUIMOS TODO EL HTML
+            document.documentElement.innerHTML = "";
+            
+            const bodyPlano = document.createElement("body");
+            bodyPlano.style.margin = "0";
+            bodyPlano.style.background = "#000";
+            bodyPlano.style.color = "#7dffb3";
+            document.documentElement.appendChild(bodyPlano);
 
-// --- 2. BASE DE DATOS DE LA API ---
-const endpoints = {
-  "kiss": [
-    { "action": "kiss", "gif": "https://media.tenor.com/217xK0yCGdMAAAAC/anime-kiss.gif" },
-    { "action": "kiss", "gif": "https://media.tenor.com/b7dJHJi8z6AAAAAC/kiss-anime.gif" }
-  ],
-  "hug": [
-    { "action": "hug", "gif": "https://media.tenor.com/FP6GehKjvXQAAAAC/anime-hug.gif" },
-    { "action": "hug", "gif": "https://media.tenor.com/9e1aE_xB0C0AAAAC/hug-anime.gif" }
-  ],
-  "kill": [
-    { "action": "kill", "gif": "https://media.tenor.com/I4mS6xAjQeIAAAAC/anime-fight.gif" },
-    { "action": "kill", "gif": "https://media.tenor.com/XsL7D7vQxCIAAAAC/anime.gif" }
-  ]
-};
+            const pre = document.createElement("pre");
+            pre.style.margin = "15px";
+            pre.style.fontFamily = "monospace";
+            pre.style.whiteSpace = "pre-wrap";
 
-// --- 3. MOTOR DE LA API (DESTRUCCIÓN DE UI PARA BOTS) ---
-function procesarPeticionApi() {
-  const hash = location.hash.replace("#", "");
+            const listaGifs = endpoints[ruta];
+            const respuestaAleatoria = listaGifs[Math.floor(Math.random() * listaGifs.length)];
 
-  // Hash de navegación interna (no destruir UI)
-  if (!hash || hash === "inicio" || hash === "como-usar" || hash === "endpoints") {
-    return; 
-  }
+            // Imprimimos el JSON puro para los bots
+            pre.textContent = JSON.stringify(respuestaAleatoria, null, 2);
+            bodyPlano.appendChild(pre);
+        }
 
-  // DESTRUCCIÓN DE LA INTERFAZ PARA ENTREGAR JSON PURO AL BOT
-  document.documentElement.innerHTML = ""; // Borra absolutamente todo el HTML y CSS
-  const newBody = document.createElement("body");
-  newBody.style.margin = "0"; // 0 márgenes para limpieza total
-  document.documentElement.appendChild(newBody);
+        // --- SISTEMA DE TABS DEL MENÚ HAMBURGUESA ---
+        function setTab(tabId) {
+            // Desactivar todos los contenidos de pestañas
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            // Activar el seleccionado
+            document.getElementById('tab-' + tabId).classList.add('active');
 
-  const pre = document.createElement("pre");
-  pre.style.wordWrap = "break-word";
-  pre.style.whiteSpace = "pre-wrap";
+            // Resetear estilos de botones del menú lateral
+            const botones = document.querySelectorAll('#sidebar-menu button');
+            botones.forEach(btn => {
+                btn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-400 hover:bg-slate-900 hover:text-white text-left transition-all";
+            });
 
-  if (endpoints[hash]) {
-    // Respuesta 200 OK - Selecciona un GIF aleatorio
-    const lista = endpoints[hash];
-    const itemAleatorio = lista[Math.floor(Math.random() * lista.length)];
-    pre.textContent = JSON.stringify(itemAleatorio, null, 2);
-  } else {
-    // Respuesta 404 Error
-    pre.textContent = JSON.stringify({ "error": "Endpoint no encontrado en AllenApi" }, null, 2);
-  }
-  
-  newBody.appendChild(pre);
-}
+            // Marcar botón activo
+            const btnActivo = document.getElementById('btn-' + tabId);
+            if(btnActivo) {
+                btnActivo.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider text-amber-500 bg-amber-500/10 border border-amber-500/20 text-left";
+            }
 
-// Escuchar cambios en el link
-window.addEventListener("hashchange", () => {
-  const hash = location.hash.replace("#", "");
-  // Solo recargamos si es una petición a un endpoint real para activar el modo texto
-  if (hash !== "inicio" && hash !== "como-usar" && hash !== "endpoints") {
-    location.reload(); 
-  }
-});
+            // Cerrar menú
+            closeSidebar();
+        }
 
-// Ejecutar al cargar la página
-procesarPeticionApi();
-</script>
+        // --- FUNCIONES DEL SIDEBAR ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar.classList.contains('closed')) {
+                sidebar.classList.remove('closed');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('opacity-100'), 10);
+            } else {
+                closeSidebar();
+            }
+        }
 
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.add('closed');
+            overlay.classList.remove('opacity-100');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+        }
+    </script>
 </body>
 </html>
