@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API de Acciones Anime</title>
+<style>
+  body { background: #0a0a0c; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+  .card { background: #1b1b1b; padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; border: 1px solid #333; }
+  pre { background: #000; padding: 15px; border-radius: 10px; color: #7dffb3; text-align: left; overflow-x: auto; font-size: 14px; }
+  img { width: 100%; border-radius: 10px; margin-top: 15px; }
+  h1 { color: #ff77c8; }
+  .hidden { display: none; }
+  .btn { display: block; background: #333; color: white; padding: 10px; margin: 5px 0; text-decoration: none; border-radius: 5px; }
+</style>
+</head>
+<body>
+
+<div class="card" id="app">
+  <div id="home">
+    <h1>Documentación API</h1>
+    <p>Usa estos enlaces para probar:</p>
+    <a href="#kiss" class="btn">GET /kiss</a>
+    <a href="#hug" class="btn">GET /hug</a>
+    <a href="#kill" class="btn">GET /kill</a>
+  </div>
+
+  <div id="response" class="hidden">
+    <h1 id="title"></h1>
+    <pre id="json"></pre>
+    <img id="gif">
+    <a href="#" class="btn">Volver</a>
+  </div>
+</div>
+
+<script>
+const endpoints = {
+  "kiss": { gif: "https://media.tenor.com/217xK0yCGdMAAAAC/anime-kiss.gif" },
+  "hug": { gif: "https://media.tenor.com/FP6GehKjvXQAAAAC/anime-hug.gif" },
+  "kill": { gif: "https://media.tenor.com/I4mS6xAjQeIAAAAC/anime-fight.gif" }
+};
+
+function router() {
+  const hash = location.hash.replace("#", "");
+  const home = document.getElementById("home");
+  const resp = document.getElementById("response");
+
+  if (endpoints[hash]) {
+    home.classList.add("hidden");
+    resp.classList.remove("hidden");
+    document.getElementById("title").textContent = "/" + hash;
+    const data = { action: hash, gif: endpoints[hash].gif };
+    document.getElementById("json").textContent = JSON.stringify(data, null, 2);
+    document.getElementById("gif").src = data.gif;
+  } else {
+    home.classList.remove("hidden");
+    resp.classList.add("hidden");
+  }
+}
+
+window.addEventListener("hashchange", router);
+router();
+</script>
+</body>
+</html>
